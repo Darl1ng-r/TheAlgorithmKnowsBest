@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import type { DilemmaQuestion, DilemmaOption } from '../types';
-import { Undo2 } from 'lucide-react';
+import { Undo2, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
-import { Crosshair, Starburst, CornerMarks } from './TechGraphics';
 
 interface DiagnoseCardProps {
   question: DilemmaQuestion;
@@ -23,7 +22,6 @@ export const DiagnoseCard: React.FC<DiagnoseCardProps> = ({
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if focus is in an input or dialog
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
 
       if (e.key === '1' || e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
@@ -39,108 +37,101 @@ export const DiagnoseCard: React.FC<DiagnoseCardProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [question, currentIndex, onSelectOption, onGoBack]);
 
-  return (
-    <div className="relative flex flex-col gap-6">
-      <CornerMarks />
+  const categoryDisplay = question.category
+    .split('_')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
 
-      {/* Technical Header & Telemetry Track */}
-      <div className="flex flex-col gap-3 border-b border-border-strong pb-4">
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Top Header & Progress Track */}
+      <div className="flex flex-col gap-3.5 border-b border-border pb-4">
         <div className="flex items-center justify-between text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <Crosshair size={12} className="text-signal-red" />
-            <span className="font-bold tracking-wider text-fg uppercase">
-              DIAGNOSIS [{currentIndex + 1} / {totalQuestions}]
+          <div className="flex items-center gap-2.5">
+            <span className="font-bold text-fg tracking-wide">
+              DIAGNOSIS {currentIndex + 1} OF {totalQuestions}
             </span>
             {isPractice && (
-              <span className="border border-signal-pink bg-signal-pink/10 px-1.5 py-0.5 text-[9px] text-signal-pink uppercase font-bold tracking-widest">
-                UNRANKED
+              <span className="border border-signal-pink bg-signal-pink/10 px-2 py-0.5 text-[10px] text-signal-pink uppercase font-bold tracking-wider rounded-sm">
+                Unranked
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="hidden sm:inline text-[10px] text-fg-muted uppercase tracking-widest">
-              CALIBRATION CYCLE 2026
-            </span>
             {currentIndex > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onGoBack}
-                className="h-6 px-2 text-[10px] font-mono uppercase text-fg-muted hover:text-fg hover:bg-surface-sunken border border-border gap-1"
+                className="h-7 px-2.5 text-xs font-mono text-fg-muted hover:text-fg hover:bg-surface-sunken border border-border rounded-sm gap-1.5"
                 title="Undo last choice (Backspace)"
               >
                 <Undo2 className="h-3 w-3" />
-                <span>Undo</span>
+                <span>Back</span>
               </Button>
             )}
           </div>
         </div>
 
-        {/* High-Tech Segmented Battery Track */}
-        <div className="flex items-center gap-1.5" role="progressbar" aria-valuenow={currentIndex + 1} aria-valuemin={1} aria-valuemax={totalQuestions}>
+        {/* Crisp Progress Track */}
+        <div className="flex items-center gap-2" role="progressbar" aria-valuenow={currentIndex + 1} aria-valuemin={1} aria-valuemax={totalQuestions}>
           {Array.from({ length: totalQuestions }).map((_, i) => (
             <div
               key={i}
-              className={`h-2 flex-1 transition-all duration-150 ${
+              className={`h-2 flex-1 rounded-sm transition-all duration-200 ${
                 i <= currentIndex
                   ? 'bg-primary border border-border-strong'
-                  : 'bg-surface-sunken border border-border/50 opacity-40'
+                  : 'bg-surface-sunken border border-border/60'
               }`}
             />
           ))}
         </div>
       </div>
 
-      {/* Dilemma Micro-Notation & Headline (Reference 1 & 2 inspired) */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-signal-red font-bold">
-          <Starburst size={10} />
-          <span>SYNTHETIC + {question.category.replace('_', ' ')} // PROTOCOL</span>
+      {/* Dilemma Header & Prompt (Sentence Case, High Readability) */}
+      <div className="space-y-2">
+        <div className="text-xs font-mono font-medium text-signal-red flex items-center gap-2">
+          <span>//</span>
+          <span className="uppercase tracking-wider font-bold">Category: {categoryDisplay}</span>
         </div>
         
-        <h2 className="font-display font-black text-2xl uppercase tracking-tight text-fg leading-tight sm:text-3xl">
+        <h2 className="font-display font-bold text-2xl sm:text-3xl text-fg leading-snug tracking-tight">
           {question.prompt}
         </h2>
-        
-        <div className="text-[11px] font-mono text-fg-muted italic">
-          /a calculated cognitive divergence test/
-        </div>
       </div>
 
-      {/* 2 Decision Tiles with Chamfered Tech Brutalist Styling */}
-      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+      {/* 2 Decision Tiles with Clear Hierarchy & Readable Body Copy */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Option A */}
         <button
           type="button"
           onClick={() => onSelectOption(question.optionA)}
-          className="group relative flex flex-col justify-between rounded-[2px] border-2 border-border-strong bg-surface p-5 text-left transition-all duration-150 hover:bg-primary hover:text-on-primary hover:shadow-lg active:translate-y-0.5 cursor-pointer"
+          className="group relative flex flex-col justify-between rounded-sm border-2 border-border-strong bg-surface p-5 sm:p-6 text-left transition-all duration-150 hover:border-signal-red hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           id="btn-choice-a"
         >
           <div>
-            <div className="flex items-center justify-between mb-4 border-b border-border group-hover:border-on-primary/30 pb-2.5">
-              <span className="inline-flex h-6 items-center px-2 font-mono text-xs font-black uppercase tracking-wider bg-surface-sunken text-fg border border-border-strong group-hover:bg-on-primary group-hover:text-primary">
-                [ KEY 1 ]
+            <div className="flex items-center justify-between mb-3 border-b border-border pb-2.5">
+              <span className="inline-flex h-6 items-center px-2 font-mono text-xs font-bold bg-surface-sunken text-fg border border-border-strong group-hover:border-signal-red group-hover:text-signal-red rounded-sm">
+                Key [1]
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-fg-muted group-hover:text-on-primary/80">
-                OPTION.01
+              <span className="font-mono text-xs text-fg-muted font-medium">
+                Option A
               </span>
             </div>
 
-            <h3 className="font-display font-extrabold text-base uppercase leading-snug tracking-tight text-fg group-hover:text-on-primary transition-colors sm:text-lg">
+            <h3 className="font-display font-bold text-lg text-fg leading-snug group-hover:text-signal-red transition-colors">
               {question.optionA.label}
             </h3>
 
-            <p className="mt-2 font-mono text-xs text-fg-muted leading-relaxed group-hover:text-on-primary/80">
+            <p className="mt-2 font-sans text-sm text-fg-muted leading-relaxed">
               {question.optionA.tagline}
             </p>
           </div>
 
-          <div className="mt-5 flex items-center justify-between pt-2 border-t border-dashed border-border/60 group-hover:border-on-primary/30 text-[10px] font-mono text-fg-muted group-hover:text-on-primary">
-            <span>DISPOSITION A</span>
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-              ENGAGE →
-            </span>
+          <div className="mt-6 flex items-center justify-between pt-2.5 border-t border-dashed border-border text-xs font-mono text-fg-muted group-hover:text-fg font-medium">
+            <span>Select this path</span>
+            <ArrowRight className="h-3.5 w-3.5 text-signal-red opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </button>
 
@@ -148,44 +139,45 @@ export const DiagnoseCard: React.FC<DiagnoseCardProps> = ({
         <button
           type="button"
           onClick={() => onSelectOption(question.optionB)}
-          className="group relative flex flex-col justify-between rounded-[2px] border-2 border-border-strong bg-surface p-5 text-left transition-all duration-150 hover:bg-primary hover:text-on-primary hover:shadow-lg active:translate-y-0.5 cursor-pointer"
+          className="group relative flex flex-col justify-between rounded-sm border-2 border-border-strong bg-surface p-5 sm:p-6 text-left transition-all duration-150 hover:border-signal-red hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
           id="btn-choice-b"
         >
           <div>
-            <div className="flex items-center justify-between mb-4 border-b border-border group-hover:border-on-primary/30 pb-2.5">
-              <span className="inline-flex h-6 items-center px-2 font-mono text-xs font-black uppercase tracking-wider bg-surface-sunken text-fg border border-border-strong group-hover:bg-on-primary group-hover:text-primary">
-                [ KEY 2 ]
+            <div className="flex items-center justify-between mb-3 border-b border-border pb-2.5">
+              <span className="inline-flex h-6 items-center px-2 font-mono text-xs font-bold bg-surface-sunken text-fg border border-border-strong group-hover:border-signal-red group-hover:text-signal-red rounded-sm">
+                Key [2]
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-fg-muted group-hover:text-on-primary/80">
-                OPTION.02
+              <span className="font-mono text-xs text-fg-muted font-medium">
+                Option B
               </span>
             </div>
 
-            <h3 className="font-display font-extrabold text-base uppercase leading-snug tracking-tight text-fg group-hover:text-on-primary transition-colors sm:text-lg">
+            <h3 className="font-display font-bold text-lg text-fg leading-snug group-hover:text-signal-red transition-colors">
               {question.optionB.label}
             </h3>
 
-            <p className="mt-2 font-mono text-xs text-fg-muted leading-relaxed group-hover:text-on-primary/80">
+            <p className="mt-2 font-sans text-sm text-fg-muted leading-relaxed">
               {question.optionB.tagline}
             </p>
           </div>
 
-          <div className="mt-5 flex items-center justify-between pt-2 border-t border-dashed border-border/60 group-hover:border-on-primary/30 text-[10px] font-mono text-fg-muted group-hover:text-on-primary">
-            <span>DISPOSITION B</span>
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-              ENGAGE →
-            </span>
+          <div className="mt-6 flex items-center justify-between pt-2.5 border-t border-dashed border-border text-xs font-mono text-fg-muted group-hover:text-fg font-medium">
+            <span>Select this path</span>
+            <ArrowRight className="h-3.5 w-3.5 text-signal-red opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </button>
       </div>
 
-      {/* Keyboard Guidance Footer */}
-      <div className="flex items-center justify-between border-t border-border pt-3 text-[10px] font-mono text-fg-muted uppercase">
+      {/* Accessible Keyboard Guidance Bar */}
+      <div className="flex items-center justify-between border-t border-border pt-3 text-xs font-mono text-fg-muted">
         <div className="flex items-center gap-1.5">
-          <Crosshair size={10} />
-          <span>KEYBOARD: [1] OR [2] TO EXECUTE</span>
+          <span>Press</span>
+          <kbd className="rounded border border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[11px] font-bold text-fg">1</kbd>
+          <span>or</span>
+          <kbd className="rounded border border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[11px] font-bold text-fg">2</kbd>
+          <span className="hidden sm:inline">to choose instantly</span>
         </div>
-        <span>STEP {currentIndex + 1} OF {totalQuestions}</span>
+        <span>Step {currentIndex + 1} of {totalQuestions}</span>
       </div>
     </div>
   );

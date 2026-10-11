@@ -20,13 +20,13 @@ export const Crosshair: React.FC<{ className?: string; size?: number }> = ({
   </svg>
 );
 
-// High-precision corner target marks
+// High-precision corner target marks (subtle, non-obtrusive)
 export const CornerMarks: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <div className={`pointer-events-none absolute inset-0 select-none ${className}`}>
-    <span className="absolute -top-2 -left-2 font-mono text-[10px] text-fg-muted font-light leading-none">+</span>
-    <span className="absolute -top-2 -right-2 font-mono text-[10px] text-fg-muted font-light leading-none">+</span>
-    <span className="absolute -bottom-2 -left-2 font-mono text-[10px] text-fg-muted font-light leading-none">+</span>
-    <span className="absolute -bottom-2 -right-2 font-mono text-[10px] text-fg-muted font-light leading-none">+</span>
+  <div className={`pointer-events-none absolute inset-2 select-none opacity-30 ${className}`}>
+    <span className="absolute top-0 left-0 font-mono text-[9px] text-fg-muted leading-none">+</span>
+    <span className="absolute top-0 right-0 font-mono text-[9px] text-fg-muted leading-none">+</span>
+    <span className="absolute bottom-0 left-0 font-mono text-[9px] text-fg-muted leading-none">+</span>
+    <span className="absolute bottom-0 right-0 font-mono text-[9px] text-fg-muted leading-none">+</span>
   </div>
 );
 

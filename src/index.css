@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Syne", "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Syne", system-ui, sans-serif;
   --font-tech: "Space Grotesk", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -28,51 +28,51 @@
 }
 
 :root {
-  /* Y2K Neo-Techno Brutalist Palette (Light Mode - Reference "Synthopsis" & "Y2K") */
-  --bg: #E3E6EB;
-  --surface: #ECEEF2;
+  /* Refined High-Legibility Architectural Palette (Light Mode) */
+  --bg: #E8ECF2;
+  --surface: #FFFFFF;
   --surface-raised: #FFFFFF;
-  --surface-sunken: #D9DCE2;
-  --fg: #0D0E13;
-  --fg-muted: #4B5262;
-  --border: #B0B7C3;
-  --border-strong: #0D0E13;
+  --surface-sunken: #F1F4F8;
+  --fg: #0B0F19;
+  --fg-muted: #4B5565;
+  --border: #CBD5E1;
+  --border-strong: #0B0F19;
 
-  --signal-red: #FF2828;
-  --signal-pink: #FF2E8A;
-  --signal-cyan: #00D8F6;
-  --signal-lime: #D2FF00;
+  --signal-red: #E61E2A;
+  --signal-pink: #E11D74;
+  --signal-cyan: #0284C7;
+  --signal-lime: #65A30D;
 
-  --primary: #0D0E13;
+  --primary: #0B0F19;
   --on-primary: #FFFFFF;
-  --secondary: #FF2E8A;
-  --warning: #F59E0B;
-  --danger: #FF2828;
-  --info: #0099FF;
+  --secondary: #E11D74;
+  --warning: #D97706;
+  --danger: #E61E2A;
+  --info: #0284C7;
 }
 
 .dark {
-  /* Cybernetic Specimen Dark Mode */
-  --bg: #0A0B0E;
-  --surface: #12141B;
-  --surface-raised: #1A1C24;
-  --surface-sunken: #0E1015;
-  --fg: #F2F4F8;
-  --fg-muted: #8F97A8;
-  --border: #282C38;
-  --border-strong: #4E5568;
+  /* High-Contrast Cybernetic Specimen (Dark Mode) */
+  --bg: #0A0C10;
+  --surface: #121620;
+  --surface-raised: #1A1F2C;
+  --surface-sunken: #0E1118;
+  --fg: #F8FAFC;
+  --fg-muted: #94A3B8;
+  --border: #252D3D;
+  --border-strong: #475569;
 
   --signal-red: #FF3B3B;
   --signal-pink: #FF3F96;
-  --signal-cyan: #00E5FF;
-  --signal-lime: #D4FF14;
+  --signal-cyan: #38BDF8;
+  --signal-lime: #A3E635;
 
-  --primary: #F2F4F8;
-  --on-primary: #0A0B0E;
+  --primary: #F8FAFC;
+  --on-primary: #0A0C10;
   --secondary: #FF3F96;
   --warning: #FBBF24;
   --danger: #FF3B3B;
-  --info: #00E5FF;
+  --info: #38BDF8;
 }
 
 /* Background blueprint grid */

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import type { Assignment, VerdictType } from '../types';
 import { Button } from './ui/button';
 import { Timer, Pause, Play, Cpu, Brain, Gavel } from 'lucide-react';
-import { Crosshair, Starburst, Barcode, CornerMarks } from './TechGraphics';
 
 interface PrescriptionCardProps {
   assignment: Assignment;
@@ -38,7 +37,7 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onRenderRuling]);
 
-  // Timer calculations
+  // Timer math
   const isTimerRunning = Boolean(timerEndsAt && timerEndsAt > now);
   const isTimerDone = Boolean(timerEndsAt && timerEndsAt <= now);
   const secondsLeft = timerEndsAt
@@ -50,70 +49,69 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
   const timerDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
   return (
-    <div className="relative flex flex-col gap-6">
-      <CornerMarks />
-
+    <div className="flex flex-col gap-6">
       {/* Top Protocol Tag */}
-      <div className="flex items-center justify-between border-b border-border-strong pb-3">
-        <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest text-signal-red uppercase font-bold">
-          <Starburst size={10} />
-          <span>PRESCRIPTION DIRECTIVE // SPEC.2026</span>
+      <div className="flex items-center justify-between border-b border-border pb-3.5">
+        <div className="flex items-center gap-2 text-xs font-mono font-bold text-signal-red uppercase tracking-wider">
+          <span>// Prescription Directive</span>
         </div>
-        <div className="text-[10px] font-mono text-fg-muted uppercase tracking-wider">
-          CATEGORY: {assignment.categoryDisplay}
+        <div className="text-xs font-mono text-fg-muted font-medium">
+          Category: {assignment.categoryDisplay}
         </div>
       </div>
 
-      {/* Main Prescription Title & Directive (Brutalist Specimen Style) */}
+      {/* Main Prescription Title & Directive (Sentence Case, High Readability) */}
       <div className="space-y-3">
-        <h2 className="font-display font-black text-2xl uppercase tracking-tight text-fg leading-tight sm:text-3xl md:text-4xl">
+        <h2 className="font-display font-bold text-2xl sm:text-3xl text-fg leading-snug tracking-tight">
           {assignment.title}
         </h2>
         
-        <div className="rounded-[2px] border-l-3 border-signal-red bg-surface-sunken/60 p-3.5 font-mono text-xs sm:text-sm text-fg leading-relaxed">
+        <div className="rounded-sm border-l-4 border-signal-red bg-surface-sunken p-4 font-sans text-sm sm:text-base text-fg leading-relaxed">
           {assignment.instruction}
         </div>
       </div>
 
       {/* Optional Audio Track Specimen */}
       {assignment.simulatedAudio && (
-        <div className="rounded-[2px] border-2 border-border-strong bg-surface p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+        <div className="rounded-sm border-2 border-border-strong bg-surface p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
           <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center border border-border-strong bg-primary text-on-primary font-bold">
+            <span className="flex h-9 w-9 items-center justify-center rounded-sm border border-border-strong bg-primary text-on-primary font-bold text-xs">
               ▶
             </span>
             <div>
-              <div className="font-bold text-fg uppercase">
+              <div className="font-bold text-fg text-sm">
                 {assignment.simulatedAudio.artist} — {assignment.simulatedAudio.track}
               </div>
-              <div className="text-[10px] text-fg-muted uppercase tracking-wider">
+              <div className="text-xs text-fg-muted">
                 {assignment.simulatedAudio.genre} · {assignment.simulatedAudio.bpm} BPM
               </div>
             </div>
           </div>
-          <Barcode code="AUDIO-WAVE-01" showCode={false} className="hidden sm:inline-flex opacity-60" />
+          <span className="font-bold text-signal-red uppercase tracking-wider">
+            [Preview Stream Ready]
+          </span>
         </div>
       )}
 
       {/* Non-blocking Persistent Mechanical Timer Bar */}
-      <div className="flex items-center justify-between rounded-[2px] border-2 border-border-strong bg-surface p-3 sm:p-4">
+      <div className="flex items-center justify-between rounded-sm border-2 border-border-strong bg-surface p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center border border-border-strong bg-surface-sunken text-signal-red">
-            <Timer className="h-4 w-4" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-border-strong bg-surface-sunken text-signal-red">
+            <Timer className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xs font-mono font-bold uppercase text-fg">
-              Micro-Protocol Timer
+            <div className="text-sm font-display font-bold text-fg">
+              Protocol Micro-Timer
             </div>
-            <div className="text-[10px] font-mono text-fg-muted uppercase tracking-wider">
-              {isTimerDone ? "Protocol Elapsed · Submit Ruling" : `${assignment.durationSeconds / 60} MINUTE CALIBRATION`}
+            <div className="text-xs font-mono text-fg-muted">
+              {isTimerDone ? "Time elapsed · Render ruling below" : `${assignment.durationSeconds / 60} minute calibration duration`}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="font-mono text-lg font-black tabular-nums tracking-widest text-fg">
-            [{timerDisplay}]
+          <span className="font-mono text-xl font-bold tabular-nums tracking-wider text-fg px-1">
+            {timerDisplay}
           </span>
 
           {!isTimerRunning ? (
@@ -121,9 +119,9 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
               variant="secondary"
               size="sm"
               onClick={() => onStartTimer(secondsLeft)}
-              className="h-8 px-3 font-mono text-xs uppercase font-bold tracking-wider border-border-strong rounded-[2px] hover:bg-primary hover:text-on-primary"
+              className="h-9 px-3.5 font-mono text-xs uppercase font-bold tracking-wider border-border-strong rounded-sm hover:bg-primary hover:text-on-primary"
             >
-              <Play className="h-3 w-3 fill-current mr-1" />
+              <Play className="h-3.5 w-3.5 fill-current mr-1" />
               <span>{timerEndsAt ? 'Resume' : 'Start'}</span>
             </Button>
           ) : (
@@ -131,9 +129,9 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
               variant="secondary"
               size="sm"
               onClick={onPauseTimer}
-              className="h-8 px-3 font-mono text-xs uppercase font-bold tracking-wider border-border-strong rounded-[2px] hover:bg-signal-red hover:text-white"
+              className="h-9 px-3.5 font-mono text-xs uppercase font-bold tracking-wider border-border-strong rounded-sm hover:bg-signal-red hover:text-white"
             >
-              <Pause className="h-3 w-3 mr-1" />
+              <Pause className="h-3.5 w-3.5 mr-1" />
               <span>Pause</span>
             </Button>
           )}
@@ -141,36 +139,33 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
       </div>
 
       {/* Strategic Rulings Grid - 3 Mechanical Verdict Buttons */}
-      <div className="border-t border-border-strong pt-3">
-        <div className="mb-3 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-widest text-fg">
-          <span className="flex items-center gap-1.5">
-            <Crosshair size={12} className="text-signal-red" />
-            <span>RENDER EMPIRICAL RULING:</span>
-          </span>
-          <span className="text-[10px] text-fg-muted font-normal">PRESS [1], [2], OR [3]</span>
+      <div className="border-t border-border pt-4">
+        <div className="mb-3 flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-fg">
+          <span>Render Empirical Ruling:</span>
+          <span className="text-fg-muted font-normal">Press [1], [2], or [3]</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {/* Concession (Algorithm was right) */}
           <button
             type="button"
             onClick={() => onRenderRuling('WAS_WRONG')}
-            className="group flex flex-col justify-between rounded-[2px] border-2 border-border-strong bg-surface p-4 text-left transition-all hover:bg-primary hover:text-on-primary hover:shadow-md active:translate-y-0.5 cursor-pointer"
+            className="group flex flex-col justify-between rounded-sm border-2 border-border-strong bg-surface p-4 text-left transition-all hover:border-signal-red hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             id="btn-rule-concede"
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Cpu className="h-4 w-4 text-signal-red group-hover:text-on-primary" />
-                <span className="border border-border group-hover:border-on-primary/40 px-1.5 py-0.5 text-[9px] font-mono font-bold">
-                  [1]
+              <div className="flex items-center justify-between mb-2.5">
+                <Cpu className="h-4 w-4 text-signal-red" />
+                <span className="border border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[10px] font-mono font-bold">
+                  Key [1]
                 </span>
               </div>
-              <div className="font-display font-extrabold text-sm uppercase tracking-tight text-fg group-hover:text-on-primary">
-                You Were Right
+              <div className="font-display font-bold text-base text-fg group-hover:text-signal-red transition-colors">
+                You were right
               </div>
             </div>
-            <div className="text-[10px] font-mono text-fg-muted mt-2 border-t border-dashed border-border/50 group-hover:border-on-primary/30 pt-1.5 group-hover:text-on-primary/80 uppercase">
-              Concede (+1 Algo)
+            <div className="text-xs font-mono text-fg-muted mt-3 border-t border-dashed border-border pt-2">
+              Concede (+1 Algorithm)
             </div>
           </button>
 
@@ -178,22 +173,22 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
           <button
             type="button"
             onClick={() => onRenderRuling('HATED_IT')}
-            className="group flex flex-col justify-between rounded-[2px] border-2 border-border-strong bg-surface p-4 text-left transition-all hover:bg-primary hover:text-on-primary hover:shadow-md active:translate-y-0.5 cursor-pointer"
+            className="group flex flex-col justify-between rounded-sm border-2 border-border-strong bg-surface p-4 text-left transition-all hover:border-signal-pink hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             id="btn-rule-defend"
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Brain className="h-4 w-4 text-signal-pink group-hover:text-on-primary" />
-                <span className="border border-border group-hover:border-on-primary/40 px-1.5 py-0.5 text-[9px] font-mono font-bold">
-                  [2]
+              <div className="flex items-center justify-between mb-2.5">
+                <Brain className="h-4 w-4 text-signal-pink" />
+                <span className="border border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[10px] font-mono font-bold">
+                  Key [2]
                 </span>
               </div>
-              <div className="font-display font-extrabold text-sm uppercase tracking-tight text-fg group-hover:text-on-primary">
-                I Was Right
+              <div className="font-display font-bold text-base text-fg group-hover:text-signal-pink transition-colors">
+                I was right
               </div>
             </div>
-            <div className="text-[10px] font-mono text-fg-muted mt-2 border-t border-dashed border-border/50 group-hover:border-on-primary/30 pt-1.5 group-hover:text-on-primary/80 uppercase">
-              Defend (+1 Human)
+            <div className="text-xs font-mono text-fg-muted mt-3 border-t border-dashed border-border pt-2">
+              Defend taste (+1 Human)
             </div>
           </button>
 
@@ -201,22 +196,22 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
           <button
             type="button"
             onClick={() => onRenderRuling('FIGHT')}
-            className="group flex flex-col justify-between rounded-[2px] border-2 border-border-strong bg-surface p-4 text-left transition-all hover:bg-signal-red hover:text-white hover:border-signal-red hover:shadow-md active:translate-y-0.5 cursor-pointer"
+            className="group flex flex-col justify-between rounded-sm border-2 border-border-strong bg-surface p-4 text-left transition-all hover:border-warning hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             id="btn-rule-objection"
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Gavel className="h-4 w-4 text-warning group-hover:text-white" />
-                <span className="border border-border group-hover:border-white/40 px-1.5 py-0.5 text-[9px] font-mono font-bold">
-                  [3]
+              <div className="flex items-center justify-between mb-2.5">
+                <Gavel className="h-4 w-4 text-warning" />
+                <span className="border border-border-strong bg-surface-sunken px-1.5 py-0.5 text-[10px] font-mono font-bold">
+                  Key [3]
                 </span>
               </div>
-              <div className="font-display font-extrabold text-sm uppercase tracking-tight text-fg group-hover:text-white">
+              <div className="font-display font-bold text-base text-fg group-hover:text-warning transition-colors">
                 Objection
               </div>
             </div>
-            <div className="text-[10px] font-mono text-fg-muted mt-2 border-t border-dashed border-border/50 group-hover:border-white/30 pt-1.5 group-hover:text-white/80 uppercase">
-              Dispute (+1 Conflict)
+            <div className="text-xs font-mono text-fg-muted mt-3 border-t border-dashed border-border pt-2">
+              Log dispute (+1 Conflict)
             </div>
           </button>
         </div>
