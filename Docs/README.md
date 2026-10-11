@@ -21,6 +21,8 @@ The engineering documentation has been organized into eight modular, deep-dive s
 | **[06. Security, Privacy & Content Safety](file:///home/darling/Downloads/Project-Related/TheAlgorithmKnowsBest/Docs/06_SECURITY_PRIVACY_AND_CONTENT_SAFETY.md)** | STRIDE & Cryptographic Integrity | HMAC-SHA256 Signed Verdict Claims, Anti-Replay Nonce Cache, Turnstile Bot Mitigation, Zero-PII GDPR/CCPA Design, Content Safety Quarantine. |
 | **[07. Scaling & High Availability](file:///home/darling/Downloads/Project-Related/TheAlgorithmKnowsBest/Docs/07_SCALING_AND_HIGH_AVAILABILITY.md)** | 1K to 1M DAU Scaling Strategy | Distributed Redis Counter Sharding (16 shards), Global Edge Caching (sub-50ms TTFB), PWA Offline Fallback, Core Web Vitals Budgets. |
 | **[08. Deployment, DevOps & CI/CD](file:///home/darling/Downloads/Project-Related/TheAlgorithmKnowsBest/Docs/08_DEPLOYMENT_DEVOPS_AND_CI_CD.md)** | Deployment Topologies & Automation | Dual Topology (Cloudflare Pages/Edge vs Hardened Docker Container), Multi-stage Dockerfile, Docker Compose, GitHub Actions Pipeline. |
+| **[09. UX Audit & Friction Redesign](file:///home/darling/Downloads/Project-Related/TheAlgorithmKnowsBest/Docs/09_UX_AUDIT_AND_REDESIGN.md)** | Friction Analysis & Streamlined IA | Critical friction audit (F1–F13), single-surface morphing card architecture, Before vs After workflow cut (−83% overhead taps), state persistence. |
+| **[10. Design System & UI Specification](file:///home/darling/Downloads/Project-Related/TheAlgorithmKnowsBest/Docs/10_DESIGN_SYSTEM_AND_UI_SPEC.md)** | Clinical Editorial Visual Identity | Machine-checked WCAG AAA contrast palettes (Light & Dark), Instrument Serif + Inter typography scale, 4px/8px rhythm, Radix & Tailwind v4 components, spring motion. |
 
 ---
 

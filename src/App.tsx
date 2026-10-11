@@ -1,344 +1,278 @@
-import { useState, useEffect, useCallback } from 'react';
-import type {
-  GamePhase,
-  DilemmaOption,
-  Assignment,
-  VerdictType,
-  TasteVector,
-  TallyRecord,
-  GlobalScore,
-} from './types';
-import { DILEMMA_POOL, ASSIGNMENT_POOL } from './core/seed-data';
+import { useState } from 'react';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
+import type { DilemmaOption, VerdictType } from './types';
+import { DailyStore, type DailyState, type UserRecord } from './state/daily-store';
 import { AntiRecommendationEngine } from './core/engine';
-import { SecurityService } from './core/security';
-import { PersonalityEngine } from './core/personality';
-import { SessionStore } from './storage/session-store';
+import { ASSIGNMENT_POOL } from './core/seed-data';
 
-import { MatrixBackground } from './components/MatrixBackground';
-import { Header } from './components/Header';
-import { HeroIntro } from './components/HeroIntro';
-import { DilemmaCard } from './components/DilemmaCard';
-import { CalculatingState } from './components/CalculatingState';
-import { AssignmentReveal } from './components/AssignmentReveal';
-import { MicroTimer } from './components/MicroTimer';
-import { VerdictTribunal } from './components/VerdictTribunal';
-import { AlgorithmRetort } from './components/AlgorithmRetort';
-import { ShareModal } from './components/ShareModal';
-
-import './styles/index.css';
-import './styles/app.css';
-
-// Sound effects synthesizer using Web Audio API (Zero external assets needed)
-const playSoundEffect = (type: 'click' | 'concede' | 'fight' | 'reveal') => {
-  try {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-
-    if (type === 'click') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    } else if (type === 'reveal') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(587, ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    } else if (type === 'concede') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-      gain.gain.setValueAtTime(0.18, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.3);
-    } else if (type === 'fight') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(160, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.25);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    }
-  } catch {
-    // Ignore audio context errors if browser blocks autoplay
-  }
-};
+import { TopBar } from './components/TopBar';
+import { DiagnoseCard } from './components/DiagnoseCard';
+import { ComputingCard } from './components/ComputingCard';
+import { PrescriptionCard } from './components/PrescriptionCard';
+import { RuledCard } from './components/RuledCard';
+import { RecordDrawer } from './components/RecordDrawer';
 
 export function App() {
-  const [phase, setPhase] = useState<GamePhase>('HERO');
-  const [dilemmaIndex, setDilemmaIndex] = useState(0);
-  const [selectedDeltas, setSelectedDeltas] = useState<TasteVector[]>([]);
-  const [activeAssignment, setActiveAssignment] = useState<Assignment | null>(null);
-  const [matchScoreDisplay, setMatchScoreDisplay] = useState('3.4%');
-  const [activeToken, setActiveToken] = useState<string | null>(null);
-  const [lastVerdict, setLastVerdict] = useState<VerdictType>('WAS_WRONG');
-  const [retortText, setRetortText] = useState('');
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [dailyState, setDailyState] = useState<DailyState>(DailyStore.getDailyState());
+  const [userRecord, setUserRecord] = useState<UserRecord>(DailyStore.getUserRecord());
+  const [isRecordOpen, setIsRecordOpen] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return document.documentElement.classList.contains('dark');
+  });
 
-  // Persistence State
-  const [localTally, setLocalTally] = useState<TallyRecord>(SessionStore.getLocalTally());
-  const [globalScore, setGlobalScore] = useState<GlobalScore>(SessionStore.getGlobalScore());
-  const [isTodayDone, setIsTodayDone] = useState(SessionStore.isTodayCompleted());
-  const [statusPhrase, setStatusPhrase] = useState(PersonalityEngine.SMUG_STATUSES[0]);
+  // Today's rotated questions (5 dilemmas based on date string)
+  const todaySeed = DailyStore.getTodayUTCString();
+  const dailyQuestions = DailyStore.getDailyQuestions(todaySeed);
 
-  // Rotate status phrases periodically
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomIdx = Math.floor(Math.random() * PersonalityEngine.SMUG_STATUSES.length);
-      setStatusPhrase(PersonalityEngine.SMUG_STATUSES[randomIdx]);
-    }, 12000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Today's 5 questions
-  const activeQuestions = DILEMMA_POOL.slice(0, 5);
-
-  // Handler: Start Game
-  const handleStartGame = () => {
-    playSoundEffect('click');
-    setDilemmaIndex(0);
-    setSelectedDeltas([]);
-    setPhase('DILEMMAS');
-  };
-
-  // Handler: Reset Today for Practice Mode
-  const handleResetForPractice = () => {
-    SessionStore.resetTodayForTesting();
-    setIsTodayDone(false);
-    handleStartGame();
+  // Sync theme
+  const toggleTheme = () => {
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('the_algo_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('the_algo_theme', 'light');
+    }
   };
 
   // Handler: Select Dilemma Option
   const handleSelectOption = (option: DilemmaOption) => {
-    playSoundEffect('click');
-    const updatedDeltas = [...selectedDeltas, option.vectorDelta];
-    setSelectedDeltas(updatedDeltas);
+    const currentQ = dailyQuestions[dailyState.currentDilemmaIndex];
+    const updatedChoices = [
+      ...dailyState.selectedChoices,
+      { questionId: currentQ.id, choice: option },
+    ];
 
-    if (dilemmaIndex + 1 < activeQuestions.length) {
-      setDilemmaIndex(prev => prev + 1);
+    if (dailyState.currentDilemmaIndex + 1 < dailyQuestions.length) {
+      const nextState: DailyState = {
+        ...dailyState,
+        currentDilemmaIndex: dailyState.currentDilemmaIndex + 1,
+        selectedChoices: updatedChoices,
+      };
+      setDailyState(nextState);
+      DailyStore.saveDailyState(nextState);
     } else {
-      // 5 choices complete -> Trigger Math Engine
-      setPhase('CALCULATING');
+      // All 5 answered -> Trigger Computing Stage
+      const reasoningNotes = DailyStore.generateReasoning(updatedChoices);
+      const computingState: DailyState = {
+        ...dailyState,
+        stage: 'computing',
+        selectedChoices: updatedChoices,
+        reasoningNotes,
+      };
+      setDailyState(computingState);
+      DailyStore.saveDailyState(computingState);
     }
   };
 
-  // Handler: Calculation Complete (Generate Anti-Recommendation & Security Token)
-  const handleCalculationComplete = useCallback(async () => {
-    playSoundEffect('reveal');
-
-    // 1. Synthesize User Taste Profile
-    const userProfile = AntiRecommendationEngine.synthesizeTasteVector(selectedDeltas);
-    const lastCategory = SessionStore.getLastCategory();
-    const seed = `${SessionStore.getTodayUTCString()}_${SecurityService.getOrCreateClientUUID()}`;
-
-    // 2. Select Uncomfortable Middle Band Candidate
-    const { assignment, matchPercentageDisplay } =
-      AntiRecommendationEngine.selectAntiRecommendation(
-        userProfile,
-        ASSIGNMENT_POOL,
-        lastCategory,
-        seed
-      );
-
-    // 3. Issue HMAC Signed Verdict Token
-    const claim = await SecurityService.issueVerdictClaim(assignment.id);
-
-    setActiveAssignment(assignment);
-    setMatchScoreDisplay(matchPercentageDisplay);
-    setActiveToken(claim.token);
-    setPhase('ASSIGNMENT');
-  }, [selectedDeltas]);
-
-  // Handler: Proceed to Timer
-  const handleProceedToExecution = () => {
-    playSoundEffect('click');
-    setPhase('EXECUTION');
+  // Handler: Undo / Go Back in Diagnose Stage
+  const handleGoBack = () => {
+    if (dailyState.currentDilemmaIndex <= 0) return;
+    const nextState: DailyState = {
+      ...dailyState,
+      currentDilemmaIndex: dailyState.currentDilemmaIndex - 1,
+      selectedChoices: dailyState.selectedChoices.slice(0, -1),
+    };
+    setDailyState(nextState);
+    DailyStore.saveDailyState(nextState);
   };
 
-  // Handler: Timer Finished / Early Finish
-  const handleTimerFinished = () => {
-    playSoundEffect('click');
-    setPhase('VERDICT');
-  };
+  // Handler: Computing Complete -> Formulate Prescription
+  const handleComputingComplete = () => {
+    const vectorDeltas = dailyState.selectedChoices.map(c => c.choice.vectorDelta);
+    const synthesizedProfile = AntiRecommendationEngine.synthesizeTasteVector(vectorDeltas);
+    const seed = `${todaySeed}_${userRecord.history.length}`;
 
-  // Handler: Render Verdict
-  const handleSelectVerdict = async (verdict: VerdictType) => {
-    if (!activeAssignment) return;
-
-    if (verdict === 'WAS_WRONG') playSoundEffect('concede');
-    else if (verdict === 'FIGHT') playSoundEffect('fight');
-    else playSoundEffect('click');
-
-    // Verify cryptographic claim
-    if (activeToken) {
-      const verification = await SecurityService.verifyVerdictClaim(
-        activeToken,
-        activeAssignment.id
-      );
-      if (!verification.valid) {
-        console.warn('Cryptographic token failure:', verification.reason);
-      }
-    }
-
-    // 1. Perturb taste profile
-    const currentTaste = SessionStore.getPersistedTasteVector();
-    const updatedTaste = AntiRecommendationEngine.perturbVectorOnVerdict(
-      currentTaste,
-      activeAssignment.vector,
-      verdict
+    const { assignment, distance } = AntiRecommendationEngine.selectAntiRecommendation(
+      synthesizedProfile,
+      ASSIGNMENT_POOL,
+      null,
+      seed
     );
 
-    // 2. Commit tallies
-    const { local, global } = SessionStore.recordVerdict(
+    const prescriptionState: DailyState = {
+      ...dailyState,
+      stage: 'prescription',
+      activeAssignment: assignment,
+      distanceScore: distance,
+      timerEndsAt: null,
+      timerDurationSeconds: assignment.durationSeconds,
+    };
+
+    setDailyState(prescriptionState);
+    DailyStore.saveDailyState(prescriptionState);
+  };
+
+  // Handler: Start Timer
+  const handleStartTimer = (durationSeconds: number) => {
+    const endsAt = Date.now() + durationSeconds * 1000;
+    const updatedState: DailyState = {
+      ...dailyState,
+      timerEndsAt: endsAt,
+    };
+    setDailyState(updatedState);
+    DailyStore.saveDailyState(updatedState);
+  };
+
+  // Handler: Pause Timer
+  const handlePauseTimer = () => {
+    const updatedState: DailyState = {
+      ...dailyState,
+      timerEndsAt: null,
+    };
+    setDailyState(updatedState);
+    DailyStore.saveDailyState(updatedState);
+  };
+
+  // Handler: Render Ruling (optimistic update & store commit)
+  const handleRenderRuling = (verdict: VerdictType) => {
+    const { updatedState, updatedRecord } = DailyStore.commitRuling(
       verdict,
-      activeAssignment.category,
-      updatedTaste
+      dailyState,
+      userRecord
     );
-
-    setLocalTally(local);
-    setGlobalScore(global);
-    setIsTodayDone(true);
-    setLastVerdict(verdict);
-
-    // 3. Synthesize sarcastic reaction
-    const reaction = PersonalityEngine.getReaction(verdict, activeAssignment.reactions);
-    setRetortText(reaction);
-
-    setPhase('RETORT');
+    setDailyState(updatedState);
+    setUserRecord(updatedRecord);
   };
 
-  // Handler: Return Home
-  const handleReturnHome = () => {
-    playSoundEffect('click');
-    setPhase('HERO');
+  // Handler: Start Unranked Practice Round
+  const handleStartUnranked = () => {
+    const practiceState = DailyStore.startUnrankedRound();
+    setDailyState(practiceState);
   };
+
+  // Handler: Clear All Data
+  const handleClearData = () => {
+    const { clearedState, clearedRecord } = DailyStore.clearAllData();
+    setDailyState(clearedState);
+    setUserRecord(clearedRecord);
+  };
+
+  const currentQ = dailyQuestions[dailyState.currentDilemmaIndex] || dailyQuestions[0];
 
   return (
-    <>
-      <MatrixBackground />
-      <div className="scanline-overlay" aria-hidden="true" />
-
-      <div className="app-container">
-        <Header
-          statusText={statusPhrase}
-          globalScore={globalScore}
-          localTally={localTally}
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-screen bg-canvas text-fg flex flex-col justify-between selection:bg-primary selection:text-on-primary">
+        {/* Sticky Glass Top Bar */}
+        <TopBar
+          streakDays={userRecord.streakDays}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
+          onOpenRecord={() => setIsRecordOpen(true)}
         />
 
-        <main className="main-stage">
-          {phase === 'HERO' && (
-            <HeroIntro
-              isTodayDone={isTodayDone}
-              localTally={localTally}
-              onStartGame={handleStartGame}
-              onResetForPractice={handleResetForPractice}
-            />
-          )}
+        {/* Central Morphing Workspace */}
+        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+          <div className="w-full max-w-xl">
+            {/* Morphing Surface Card */}
+            <div className="rounded-[20px] border border-border bg-surface p-6 sm:p-8 shadow-md transition-shadow">
+              <AnimatePresence mode="wait">
+                {dailyState.stage === 'diagnose' && (
+                  <motion.div
+                    key={`diagnose-${dailyState.currentDilemmaIndex}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <DiagnoseCard
+                      question={currentQ}
+                      currentIndex={dailyState.currentDilemmaIndex}
+                      totalQuestions={dailyQuestions.length}
+                      isPractice={dailyState.isPracticeRound}
+                      onSelectOption={handleSelectOption}
+                      onGoBack={handleGoBack}
+                    />
+                  </motion.div>
+                )}
 
-          {phase === 'DILEMMAS' && (
-            <DilemmaCard
-              question={activeQuestions[dilemmaIndex]}
-              currentIndex={dilemmaIndex}
-              totalQuestions={activeQuestions.length}
-              onSelectOption={handleSelectOption}
-            />
-          )}
+                {dailyState.stage === 'computing' && (
+                  <motion.div
+                    key="computing"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <ComputingCard
+                      reasoningNotes={dailyState.reasoningNotes}
+                      onComplete={handleComputingComplete}
+                    />
+                  </motion.div>
+                )}
 
-          {phase === 'CALCULATING' && (
-            <CalculatingState onComplete={handleCalculationComplete} />
-          )}
+                {dailyState.stage === 'prescription' && dailyState.activeAssignment && (
+                  <motion.div
+                    key="prescription"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <PrescriptionCard
+                      assignment={dailyState.activeAssignment}
+                      distanceScore={dailyState.distanceScore}
+                      timerEndsAt={dailyState.timerEndsAt}
+                      onStartTimer={handleStartTimer}
+                      onPauseTimer={handlePauseTimer}
+                      onRenderRuling={handleRenderRuling}
+                    />
+                  </motion.div>
+                )}
 
-          {phase === 'ASSIGNMENT' && activeAssignment && (
-            <AssignmentReveal
-              assignment={activeAssignment}
-              matchScoreDisplay={matchScoreDisplay}
-              onProceedToExecution={handleProceedToExecution}
-            />
-          )}
+                {dailyState.stage === 'ruled' && dailyState.activeAssignment && dailyState.verdict && (
+                  <motion.div
+                    key="ruled"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <RuledCard
+                      assignment={dailyState.activeAssignment}
+                      verdict={dailyState.verdict}
+                      retort={dailyState.retort || 'The Algorithm remains undefeated.'}
+                      isPractice={dailyState.isPracticeRound}
+                      onStartUnranked={handleStartUnranked}
+                      onOpenRecord={() => setIsRecordOpen(true)}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-          {phase === 'EXECUTION' && activeAssignment && (
-            <MicroTimer
-              assignment={activeAssignment}
-              onTimerFinished={handleTimerFinished}
-            />
-          )}
-
-          {phase === 'VERDICT' && (
-            <VerdictTribunal onSelectVerdict={handleSelectVerdict} />
-          )}
-
-          {phase === 'RETORT' && activeAssignment && (
-            <AlgorithmRetort
-              verdict={lastVerdict}
-              retortText={retortText}
-              assignment={activeAssignment}
-              localTally={localTally}
-              onOpenShare={() => setIsShareModalOpen(true)}
-              onReturnHome={handleReturnHome}
-            />
-          )}
+            {/* Subtle Footer Caption */}
+            <div className="mt-4 text-center text-xs font-mono text-fg-muted">
+              Zero accounts · Data persisted in your local client · Clinical Anti-Recommendation
+            </div>
+          </div>
         </main>
 
-        <footer className="app-footer">
-          <div className="footer-links">
-            <button type="button" className="footer-link" onClick={() => setPhase('HERO')}>
-              Overview
-            </button>
+        {/* Minimal Footer */}
+        <footer className="w-full border-t border-border py-4 text-center text-xs font-mono text-fg-muted">
+          <div className="mx-auto flex max-w-xl items-center justify-between px-4">
+            <span>© 2026 The Algorithm Knows Best</span>
             <button
               type="button"
-              className="footer-link"
-              onClick={handleResetForPractice}
+              onClick={() => setIsRecordOpen(true)}
+              className="hover:text-fg transition-colors"
             >
-              Practice Mode
+              View Record
             </button>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-link"
-            >
-              Docs &amp; Architecture
-            </a>
           </div>
-          <p>© 2026 The Algorithm Knows Best. Mathematics remains undefeated.</p>
         </footer>
-      </div>
 
-      {isShareModalOpen && activeAssignment && (
-        <ShareModal
-          assignment={activeAssignment}
-          verdict={lastVerdict}
-          retortText={retortText}
-          localTally={localTally}
-          onClose={() => setIsShareModalOpen(false)}
+        {/* Record Sheet Drawer */}
+        <RecordDrawer
+          isOpen={isRecordOpen}
+          onClose={() => setIsRecordOpen(false)}
+          record={userRecord}
+          onClearData={handleClearData}
         />
-      )}
-    </>
+      </div>
+    </MotionConfig>
   );
 }
 

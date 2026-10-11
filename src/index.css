@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-canvas: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-on-secondary: var(--on-secondary);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+}
+
+:root {
+  --bg: #F7F6F2;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --surface-sunken: #EFEDE6;
+  --fg: #111318;
+  --fg-muted: #3F4550;
+  --border: #D9D6CC;
+  --border-strong: #8A8578;
+  
+  --primary: #2E4600;
+  --primary-soft: #EAF1D6;
+  --on-primary: #FFFFFF;
+
+  --secondary: #8A1F3D;
+  --secondary-soft: #F8E4EA;
+  --on-secondary: #FFFFFF;
+
+  --success: #14532D;
+  --success-soft: #DCF2E3;
+  --warning: #713F12;
+  --warning-soft: #F8EAD8;
+  --danger: #8F1D1D;
+  --danger-soft: #F9E0E0;
+  --info: #1E3A8A;
+  --info-soft: #E0E8F8;
+}
+
+.dark {
+  --bg: #0B0C0F;
+  --surface: #131519;
+  --surface-raised: #1A1D22;
+  --surface-sunken: #08090B;
+  --fg: #F4F3EE;
+  --fg-muted: #B8BCC6;
+  --border: #2A2E36;
+  --border-strong: #6B717D;
+
+  --primary: #D4F55C;
+  --primary-soft: #232A0E;
+  --on-primary: #0B0C0F;
+
+  --secondary: #FFB4C2;
+  --secondary-soft: #3A1E25;
+  --on-secondary: #0B0C0F;
+
+  --success: #86EFAC;
+  --success-soft: #0F2A1A;
+  --warning: #FCD34D;
+  --warning-soft: #2E2408;
+  --danger: #FCA5A5;
+  --danger-soft: #341616;
+  --info: #93C5FD;
+  --info-soft: #13233A;
+}
+
+/* Base Body Setup */
+html, body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+
+/* Focus Ring */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Accessible transitions respect */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
