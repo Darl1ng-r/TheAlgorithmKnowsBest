@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { Assignment, VerdictType } from '../types';
 import { Button } from './ui/button';
-import { Share2, BookOpen, Check, Sparkles } from 'lucide-react';
+import { Share2, BookOpen, Check, Sparkles, MessageCircleCode } from 'lucide-react';
 import { CircuitGlyph } from './TechGraphics';
+import { NUDGE_PROVOCATIONS } from '../core/seed-data';
 
 interface RuledCardProps {
   assignment: Assignment;
@@ -22,6 +23,7 @@ export const RuledCard: React.FC<RuledCardProps> = ({
   onOpenRecord,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copiedNudgeIdx, setCopiedNudgeIdx] = useState<number | null>(null);
   const [timeUntilTomorrow, setTimeUntilTomorrow] = useState('');
 
   // Countdown to next UTC midnight
@@ -73,6 +75,17 @@ export const RuledCard: React.FC<RuledCardProps> = ({
       } catch {
         // Fallback
       }
+    }
+  };
+
+  const handleCopyNudge = async (nudgeText: string, idx: number) => {
+    const fullText = `"${nudgeText}"\n\nThe Algorithm evaluated me on "${assignment.title}". Vote here: ${window.location.href}`;
+    try {
+      await navigator.clipboard.writeText(fullText);
+      setCopiedNudgeIdx(idx);
+      setTimeout(() => setCopiedNudgeIdx(null), 2000);
+    } catch {
+      // Fallback
     }
   };
 
@@ -166,6 +179,35 @@ export const RuledCard: React.FC<RuledCardProps> = ({
           <BookOpen className="h-4 w-4" />
           <span>View Record</span>
         </Button>
+      </div>
+
+      {/* Nudge a Friend / Playful Provocations (Pillar 4) */}
+      <div className="rounded-sm border-2 border-border-strong bg-surface p-4 sm:p-5 space-y-3">
+        <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-fg">
+          <span className="flex items-center gap-1.5">
+            <MessageCircleCode className="h-4 w-4 text-signal-pink" />
+            <span>Nudge A Friend / Provocation Lines:</span>
+          </span>
+          <span className="text-[11px] text-fg-muted font-normal">Tap to copy hook</span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2">
+          {NUDGE_PROVOCATIONS.map((nudge, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleCopyNudge(nudge, idx)}
+              className="group flex items-center justify-between text-left p-2.5 rounded-sm border border-border bg-surface-sunken hover:border-signal-pink hover:bg-surface text-xs font-mono transition-all cursor-pointer"
+            >
+              <span className="text-fg-muted group-hover:text-fg font-medium pr-2">
+                &ldquo;{nudge}&rdquo;
+              </span>
+              <span className="shrink-0 text-[10px] font-bold text-signal-pink">
+                {copiedNudgeIdx === idx ? 'Copied!' : 'Copy'}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Next Calibration Countdown & Practice Round */}
