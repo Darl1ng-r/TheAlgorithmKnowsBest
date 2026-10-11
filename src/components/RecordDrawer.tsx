@@ -7,9 +7,9 @@ import {
   SheetTitle,
   SheetDescription,
 } from './ui/sheet';
-import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Flame, Cpu, Brain, Gavel, Trash2 } from 'lucide-react';
+import { Crosshair, Starburst, Barcode, CornerMarks } from './TechGraphics';
 
 interface RecordDrawerProps {
   isOpen: boolean;
@@ -37,103 +37,134 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
   });
 
   const getVerdictBadge = (verdict: VerdictType) => {
-    if (verdict === 'WAS_WRONG') return <Badge tone="primary">Algorithm</Badge>;
-    if (verdict === 'HATED_IT') return <Badge tone="secondary">Human</Badge>;
-    return <Badge tone="warning">Dispute</Badge>;
+    if (verdict === 'WAS_WRONG') {
+      return (
+        <span className="border border-border-strong bg-primary text-on-primary px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase">
+          ALGORITHM +1
+        </span>
+      );
+    }
+    if (verdict === 'HATED_IT') {
+      return (
+        <span className="border border-border-strong bg-signal-pink text-white px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase">
+          HUMAN +1
+        </span>
+      );
+    }
+    return (
+      <span className="border border-border-strong bg-warning text-fg px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase">
+        DISPUTE
+      </span>
+    );
   };
 
   const p = record.tasteProfile;
   const tasteAxes = [
     { labelLeft: 'Comfort / Routine', labelRight: 'Adventurous', val: p.adventurousness },
-    { labelLeft: 'Mild / Subtle', labelRight: 'High Stimulus', val: p.sensoryIntensity },
-    { labelLeft: 'Canon / Traditional', labelRight: 'Avant-Garde', val: p.tradition },
-    { labelLeft: 'Low-Effort', labelRight: 'Deep Analytical', val: p.cognitiveEffort },
-    { labelLeft: 'Utilitarian', labelRight: 'Absurd / Dadaist', val: p.absurdity },
+    { labelLeft: 'Subtle / Ambient', labelRight: 'Sensory Overload', val: p.sensoryIntensity },
+    { labelLeft: 'Orthodox / Classic', labelRight: 'Avant-Garde', val: p.tradition },
+    { labelLeft: 'Low-Effort Passive', labelRight: 'Deep Analytical', val: p.cognitiveEffort },
+    { labelLeft: 'Utilitarian Functional', labelRight: 'Absurd / Dadaist', val: p.absurdity },
   ];
 
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
-      <SheetContent>
+      <SheetContent className="border-l-2 border-border-strong bg-surface">
         <SheetHeader>
-          <SheetTitle>Your Empirical Record</SheetTitle>
-          <SheetDescription>
-            Historical accountability between your mortal instincts and the Algorithm.
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="flex items-center gap-2">
+              <Crosshair size={14} className="text-signal-red" />
+              <SheetTitle className="font-display font-black text-xl uppercase tracking-tight text-fg">
+                Specimen Dossier
+              </SheetTitle>
+            </div>
+            <Barcode code="REC-2026.LEDGER" showCode={false} className="opacity-80" />
+          </div>
+          <SheetDescription className="font-mono text-xs text-fg-muted uppercase">
+            EMPIRICAL ACCOUNTABILITY LOG // HUMAN VS THE ALGORITHM
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-8 pb-10">
-          {/* Stat Tiles */}
+        <div className="flex flex-col gap-6 pb-12 pt-2">
+          {/* 3 Telemetry Stat Tiles */}
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="rounded-[12px] border border-border bg-surface-sunken/60 p-3 flex flex-col">
-              <div className="flex items-center gap-1.5 text-xs font-mono text-primary font-semibold">
-                <Cpu className="h-3.5 w-3.5" />
-                <span>Algorithm</span>
+            <div className="relative rounded-[2px] border-2 border-border-strong bg-surface-sunken p-3 flex flex-col justify-between">
+              <CornerMarks />
+              <div className="flex items-center gap-1 text-[10px] font-mono text-fg font-bold uppercase">
+                <Cpu className="h-3 w-3 text-signal-red" />
+                <span>ALGO</span>
               </div>
-              <span className="text-2xl font-bold font-mono mt-1 text-fg">
+              <span className="text-2xl font-black font-mono mt-1 text-fg tabular-nums">
                 {record.algoWins}
               </span>
-              <span className="text-[10px] text-fg-muted">Right</span>
+              <span className="text-[9px] font-mono text-fg-muted uppercase">Conceded</span>
             </div>
 
-            <div className="rounded-[12px] border border-border bg-surface-sunken/60 p-3 flex flex-col">
-              <div className="flex items-center gap-1.5 text-xs font-mono text-secondary font-semibold">
-                <Brain className="h-3.5 w-3.5" />
-                <span>Human</span>
+            <div className="relative rounded-[2px] border-2 border-border-strong bg-surface-sunken p-3 flex flex-col justify-between">
+              <CornerMarks />
+              <div className="flex items-center gap-1 text-[10px] font-mono text-fg font-bold uppercase">
+                <Brain className="h-3 w-3 text-signal-pink" />
+                <span>HUMAN</span>
               </div>
-              <span className="text-2xl font-bold font-mono mt-1 text-fg">
+              <span className="text-2xl font-black font-mono mt-1 text-fg tabular-nums">
                 {record.humanWins}
               </span>
-              <span className="text-[10px] text-fg-muted">Right</span>
+              <span className="text-[9px] font-mono text-fg-muted uppercase">Defended</span>
             </div>
 
-            <div className="rounded-[12px] border border-border bg-surface-sunken/60 p-3 flex flex-col">
-              <div className="flex items-center gap-1.5 text-xs font-mono text-warning font-semibold">
-                <Gavel className="h-3.5 w-3.5" />
-                <span>Disputes</span>
+            <div className="relative rounded-[2px] border-2 border-border-strong bg-surface-sunken p-3 flex flex-col justify-between">
+              <CornerMarks />
+              <div className="flex items-center gap-1 text-[10px] font-mono text-fg font-bold uppercase">
+                <Gavel className="h-3 w-3 text-warning" />
+                <span>DISPUTE</span>
               </div>
-              <span className="text-2xl font-bold font-mono mt-1 text-fg">
+              <span className="text-2xl font-black font-mono mt-1 text-fg tabular-nums">
                 {record.disputed}
               </span>
-              <span className="text-[10px] text-fg-muted">Active</span>
+              <span className="text-[9px] font-mono text-fg-muted uppercase">Active</span>
             </div>
           </div>
 
           {/* Streak Banner */}
-          <div className="flex items-center justify-between rounded-[10px] border border-border bg-surface p-3.5">
+          <div className="flex items-center justify-between rounded-[2px] border-2 border-border-strong bg-surface p-3 font-mono text-xs">
             <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-warning fill-current" />
-              <span className="text-xs font-medium text-fg">Consecutive Calibrations</span>
+              <Flame className="h-4 w-4 text-signal-red fill-current" />
+              <span className="font-bold text-fg uppercase">Consecutive Calibrations:</span>
             </div>
-            <span className="font-mono text-sm font-bold text-warning">
-              {record.streakDays} Days
+            <span className="font-black text-signal-red text-sm">
+              [{record.streakDays} DAYS]
             </span>
           </div>
 
-          {/* 5-Axis Taste Profile */}
-          <div>
-            <h3 className="text-xs font-mono uppercase tracking-wider text-fg-muted mb-3">
-              5-Axis Taste Profile (Perturbed)
-            </h3>
-            <div className="space-y-3.5 rounded-[12px] border border-border bg-surface p-4">
+          {/* 5-Axis Taste Profile (Perturbed) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-fg-muted font-bold">
+              <div className="flex items-center gap-1">
+                <Starburst size={10} className="text-signal-red" />
+                <span>5-AXIS TASTE VECTOR SPECTRUM</span>
+              </div>
+              <span>DELTA SCALE</span>
+            </div>
+
+            <div className="space-y-3 rounded-[2px] border-2 border-border-strong bg-surface p-4">
               {tasteAxes.map((axis, i) => {
-                // val is [-1, 1]. Map to percent [0, 100]
                 const percent = Math.min(100, Math.max(0, ((axis.val + 1) / 2) * 100));
                 return (
-                  <div key={i} className="text-xs">
-                    <div className="flex justify-between text-[11px] text-fg-muted mb-1 font-mono">
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono text-fg-muted uppercase">
                       <span>{axis.labelLeft}</span>
                       <span>{axis.labelRight}</span>
                     </div>
-                    <div className="relative h-2 w-full rounded-full bg-surface-sunken overflow-hidden">
+                    <div className="relative h-2 w-full border border-border-strong bg-surface-sunken overflow-hidden">
+                      {/* Center tick */}
+                      <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-border-strong z-10" />
                       <div
-                        className="absolute top-0 bottom-0 bg-primary transition-all duration-300"
+                        className="absolute top-0 bottom-0 bg-signal-red transition-all duration-300"
                         style={{
                           left: `${Math.min(50, percent)}%`,
                           width: `${Math.abs(percent - 50)}%`,
                         }}
                       />
-                      {/* Center zero line */}
-                      <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-border-strong" />
                     </div>
                   </div>
                 );
@@ -141,22 +172,22 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
             </div>
           </div>
 
-          {/* History Ledger Table */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-fg-muted">
-                Ruling Ledger ({record.history.length})
+          {/* Ruling Ledger History Table */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-fg font-bold">
+                CALIBRATION LEDGER ({record.history.length})
               </h3>
 
               {/* Filter chips */}
-              <div className="flex gap-1 rounded-full bg-surface-sunken p-1 border border-border">
+              <div className="flex gap-1 border border-border-strong bg-surface-sunken p-0.5">
                 {(['ALL', 'ALGO', 'HUMAN'] as FilterType[]).map(t => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setFilter(t)}
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-mono font-medium transition-colors cursor-pointer ${
-                      filter === t ? 'bg-surface text-fg shadow-sm' : 'text-fg-muted hover:text-fg'
+                    className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                      filter === t ? 'bg-primary text-on-primary' : 'text-fg-muted hover:text-fg'
                     }`}
                   >
                     {t}
@@ -166,8 +197,8 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
             </div>
 
             {filteredHistory.length === 0 ? (
-              <div className="rounded-[12px] border border-dashed border-border p-6 text-center text-xs text-fg-muted">
-                No rulings logged in this view yet.
+              <div className="rounded-[2px] border-2 border-dashed border-border p-6 text-center text-xs font-mono text-fg-muted uppercase">
+                NO RULINGS ARCHIVED UNDER THIS FILTER
               </div>
             ) : (
               <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -177,24 +208,24 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
                   .map(entry => (
                     <div
                       key={entry.id}
-                      className="rounded-[10px] border border-border bg-surface p-3 text-xs flex items-center justify-between gap-2 hover:bg-surface-sunken/40 transition-colors"
+                      className="rounded-[2px] border-2 border-border-strong bg-surface p-3 text-xs flex items-center justify-between gap-2 hover:bg-surface-sunken transition-colors"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[10px] text-fg-muted">
-                            {entry.date}
+                          <span className="font-mono text-[9px] text-fg-muted">
+                            [{entry.date}]
                           </span>
                           {entry.isPractice && (
-                            <span className="rounded bg-info-soft px-1 text-[9px] text-info font-bold">
+                            <span className="border border-signal-pink bg-signal-pink/10 px-1 text-[8px] text-signal-pink font-bold font-mono uppercase">
                               PRACTICE
                             </span>
                           )}
                         </div>
-                        <div className="font-medium text-fg truncate mt-0.5">
+                        <div className="font-display font-bold text-fg uppercase truncate mt-0.5">
                           {entry.title}
                         </div>
-                        <div className="text-[10px] text-fg-muted">
-                          Distance: {entry.distance.toFixed(2)}
+                        <div className="text-[9px] font-mono text-fg-muted uppercase">
+                          DISTANCE COEFFICIENT: {entry.distance.toFixed(2)}
                         </div>
                       </div>
                       <div className="shrink-0">{getVerdictBadge(entry.verdict)}</div>
@@ -205,16 +236,16 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
           </div>
 
           {/* Reset All Data (Two-step confirm) */}
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t border-border-strong">
             {!confirmClear ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setConfirmClear(true)}
-                className="w-full text-xs text-danger hover:bg-danger-soft hover:text-danger gap-1.5"
+                className="w-full text-xs font-mono uppercase font-bold text-danger hover:bg-danger/10 hover:text-danger gap-1.5 border border-dashed border-danger/40 rounded-[2px]"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                <span>Reset All History &amp; Streaks</span>
+                <span>PURGE ALL SPECIMEN RECORDS</span>
               </Button>
             ) : (
               <div className="flex items-center gap-2">
@@ -226,17 +257,17 @@ export const RecordDrawer: React.FC<RecordDrawerProps> = ({
                     setConfirmClear(false);
                     onClose();
                   }}
-                  className="flex-1 text-xs"
+                  className="flex-1 text-xs font-mono uppercase font-bold rounded-[2px]"
                 >
-                  Confirm Full Reset
+                  CONFIRM PURGE
                 </Button>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => setConfirmClear(false)}
-                  className="text-xs"
+                  className="text-xs font-mono uppercase font-bold rounded-[2px] border-border-strong"
                 >
-                  Cancel
+                  CANCEL
                 </Button>
               </div>
             )}

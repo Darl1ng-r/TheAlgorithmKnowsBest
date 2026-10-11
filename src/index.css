@@ -1,106 +1,139 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Syne", "Space Grotesk", system-ui, sans-serif;
+  --font-tech: "Space Grotesk", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Inter", system-ui, sans-serif;
 
   --color-canvas: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-raised: var(--surface-raised);
   --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
 
+  --color-signal-red: var(--signal-red);
+  --color-signal-pink: var(--signal-pink);
+  --color-signal-cyan: var(--signal-cyan);
+  --color-signal-lime: var(--signal-lime);
   --color-primary: var(--primary);
-  --color-primary-soft: var(--primary-soft);
   --color-on-primary: var(--on-primary);
-
   --color-secondary: var(--secondary);
-  --color-secondary-soft: var(--secondary-soft);
-  --color-on-secondary: var(--on-secondary);
-
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
-  --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
   --color-info: var(--info);
-  --color-info-soft: var(--info-soft);
 }
 
 :root {
-  --bg: #F7F6F2;
-  --surface: #FFFFFF;
+  /* Y2K Neo-Techno Brutalist Palette (Light Mode - Reference "Synthopsis" & "Y2K") */
+  --bg: #E3E6EB;
+  --surface: #ECEEF2;
   --surface-raised: #FFFFFF;
-  --surface-sunken: #EFEDE6;
-  --fg: #111318;
-  --fg-muted: #3F4550;
-  --border: #D9D6CC;
-  --border-strong: #8A8578;
-  
-  --primary: #2E4600;
-  --primary-soft: #EAF1D6;
+  --surface-sunken: #D9DCE2;
+  --fg: #0D0E13;
+  --fg-muted: #4B5262;
+  --border: #B0B7C3;
+  --border-strong: #0D0E13;
+
+  --signal-red: #FF2828;
+  --signal-pink: #FF2E8A;
+  --signal-cyan: #00D8F6;
+  --signal-lime: #D2FF00;
+
+  --primary: #0D0E13;
   --on-primary: #FFFFFF;
-
-  --secondary: #8A1F3D;
-  --secondary-soft: #F8E4EA;
-  --on-secondary: #FFFFFF;
-
-  --success: #14532D;
-  --success-soft: #DCF2E3;
-  --warning: #713F12;
-  --warning-soft: #F8EAD8;
-  --danger: #8F1D1D;
-  --danger-soft: #F9E0E0;
-  --info: #1E3A8A;
-  --info-soft: #E0E8F8;
+  --secondary: #FF2E8A;
+  --warning: #F59E0B;
+  --danger: #FF2828;
+  --info: #0099FF;
 }
 
 .dark {
-  --bg: #0B0C0F;
-  --surface: #131519;
-  --surface-raised: #1A1D22;
-  --surface-sunken: #08090B;
-  --fg: #F4F3EE;
-  --fg-muted: #B8BCC6;
-  --border: #2A2E36;
-  --border-strong: #6B717D;
+  /* Cybernetic Specimen Dark Mode */
+  --bg: #0A0B0E;
+  --surface: #12141B;
+  --surface-raised: #1A1C24;
+  --surface-sunken: #0E1015;
+  --fg: #F2F4F8;
+  --fg-muted: #8F97A8;
+  --border: #282C38;
+  --border-strong: #4E5568;
 
-  --primary: #D4F55C;
-  --primary-soft: #232A0E;
-  --on-primary: #0B0C0F;
+  --signal-red: #FF3B3B;
+  --signal-pink: #FF3F96;
+  --signal-cyan: #00E5FF;
+  --signal-lime: #D4FF14;
 
-  --secondary: #FFB4C2;
-  --secondary-soft: #3A1E25;
-  --on-secondary: #0B0C0F;
-
-  --success: #86EFAC;
-  --success-soft: #0F2A1A;
-  --warning: #FCD34D;
-  --warning-soft: #2E2408;
-  --danger: #FCA5A5;
-  --danger-soft: #341616;
-  --info: #93C5FD;
-  --info-soft: #13233A;
+  --primary: #F2F4F8;
+  --on-primary: #0A0B0E;
+  --secondary: #FF3F96;
+  --warning: #FBBF24;
+  --danger: #FF3B3B;
+  --info: #00E5FF;
 }
 
-/* Base Body Setup */
-html, body {
-  background-color: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Background blueprint grid */
+.tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(13, 14, 19, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(13, 14, 19, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-/* Custom Scrollbars */
+.dark .tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Chamfered mechanical corner clips */
+.chamfer-card {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+.chamfer-pill {
+  clip-path: polygon(
+    0 6px,
+    6px 0,
+    calc(100% - 6px) 0,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    0 calc(100% - 6px)
+  );
+}
+
+/* Pixel checkerboard texture */
+.checker-bar {
+  background-image: linear-gradient(45deg, #0D0E13 25%, transparent 25%), 
+                    linear-gradient(-45deg, #0D0E13 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #0D0E13 75%), 
+                    linear-gradient(-45deg, transparent 75%, #0D0E13 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 0 3px, 3px -3px, -3px 0px;
+}
+
+.dark .checker-bar {
+  background-image: linear-gradient(45deg, #FFFFFF 25%, transparent 25%), 
+                    linear-gradient(-45deg, #FFFFFF 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #FFFFFF 75%), 
+                    linear-gradient(-45deg, transparent 75%, #FFFFFF 75%);
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -109,22 +142,10 @@ html, body {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 9999px;
+  background: var(--fg);
 }
 
-/* Focus Ring */
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Accessible transitions respect */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+::selection {
+  background: var(--signal-red);
+  color: #FFFFFF;
 }

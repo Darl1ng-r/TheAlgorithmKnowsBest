@@ -11,6 +11,7 @@ import { ComputingCard } from './components/ComputingCard';
 import { PrescriptionCard } from './components/PrescriptionCard';
 import { RuledCard } from './components/RuledCard';
 import { RecordDrawer } from './components/RecordDrawer';
+import { Crosshair, Barcode } from './components/TechGraphics';
 
 export function App() {
   const [dailyState, setDailyState] = useState<DailyState>(DailyStore.getDailyState());
@@ -154,8 +155,22 @@ export function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-canvas text-fg flex flex-col justify-between selection:bg-primary selection:text-on-primary">
-        {/* Sticky Glass Top Bar */}
+      <div className="relative min-h-screen bg-canvas tech-grid text-fg flex flex-col justify-between selection:bg-signal-red selection:text-white">
+        {/* Viewport Corner Registration Marks (Reference 1 & 2) */}
+        <div className="pointer-events-none fixed top-2 left-2 z-50 font-mono text-[10px] text-fg-muted select-none">
+          + 00.00
+        </div>
+        <div className="pointer-events-none fixed top-2 right-2 z-50 font-mono text-[10px] text-fg-muted select-none">
+          + 100.00
+        </div>
+        <div className="pointer-events-none fixed bottom-2 left-2 z-50 font-mono text-[10px] text-fg-muted select-none">
+          + 00.100
+        </div>
+        <div className="pointer-events-none fixed bottom-2 right-2 z-50 font-mono text-[10px] text-fg-muted select-none">
+          + 100.100
+        </div>
+
+        {/* Sticky Y2K Top Bar */}
         <TopBar
           streakDays={userRecord.streakDays}
           isDark={isDark}
@@ -164,18 +179,18 @@ export function App() {
         />
 
         {/* Central Morphing Workspace */}
-        <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+        <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 md:p-8">
           <div className="w-full max-w-xl">
-            {/* Morphing Surface Card */}
-            <div className="rounded-[20px] border border-border bg-surface p-6 sm:p-8 shadow-md transition-shadow">
+            {/* Morphing Surface Card with Brutalist 2px Border & Corner Targets */}
+            <div className="relative rounded-[2px] border-2 border-border-strong bg-surface p-5 sm:p-8 shadow-[8px_8px_0px_0px_rgba(13,14,19,0.8)] dark:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.9)] transition-shadow">
               <AnimatePresence mode="wait">
                 {dailyState.stage === 'diagnose' && (
                   <motion.div
                     key={`diagnose-${dailyState.currentDilemmaIndex}`}
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <DiagnoseCard
                       question={currentQ}
@@ -191,10 +206,10 @@ export function App() {
                 {dailyState.stage === 'computing' && (
                   <motion.div
                     key="computing"
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <ComputingCard
                       reasoningNotes={dailyState.reasoningNotes}
@@ -206,14 +221,13 @@ export function App() {
                 {dailyState.stage === 'prescription' && dailyState.activeAssignment && (
                   <motion.div
                     key="prescription"
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <PrescriptionCard
                       assignment={dailyState.activeAssignment}
-                      distanceScore={dailyState.distanceScore}
                       timerEndsAt={dailyState.timerEndsAt}
                       onStartTimer={handleStartTimer}
                       onPauseTimer={handlePauseTimer}
@@ -225,10 +239,10 @@ export function App() {
                 {dailyState.stage === 'ruled' && dailyState.activeAssignment && dailyState.verdict && (
                   <motion.div
                     key="ruled"
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <RuledCard
                       assignment={dailyState.activeAssignment}
@@ -243,24 +257,36 @@ export function App() {
               </AnimatePresence>
             </div>
 
-            {/* Subtle Footer Caption */}
-            <div className="mt-4 text-center text-xs font-mono text-fg-muted">
-              Zero accounts · Data persisted in your local client · Clinical Anti-Recommendation
+            {/* Micro Monospace Footer Subtitle */}
+            <div className="mt-4 flex items-center justify-between text-[9px] font-mono uppercase tracking-widest text-fg-muted px-1 select-none">
+              <span className="flex items-center gap-1">
+                <Crosshair size={10} />
+                <span>SPECIMEN DATA STORED LOCALLY</span>
+              </span>
+              <span>CALCULATED COGNITIVE FRICTION // 2026</span>
             </div>
           </div>
         </main>
 
-        {/* Minimal Footer */}
-        <footer className="w-full border-t border-border py-4 text-center text-xs font-mono text-fg-muted">
-          <div className="mx-auto flex max-w-xl items-center justify-between px-4">
-            <span>© 2026 The Algorithm Knows Best</span>
-            <button
-              type="button"
-              onClick={() => setIsRecordOpen(true)}
-              className="hover:text-fg transition-colors"
-            >
-              View Record
-            </button>
+        {/* Minimal High-Tech Footer with Barcode */}
+        <footer className="w-full border-t border-border-strong bg-surface/80 py-3 text-xs font-mono text-fg-muted select-none">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-fg">© 2026 THE ALGORITHM KNOWS BEST</span>
+              <span className="hidden sm:inline text-border-strong">|</span>
+              <span className="hidden sm:inline text-[10px]">ALL MORTAL BIASES LOGGED</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Barcode code="ALGO-MILLENNIUM" showCode={false} className="hidden md:inline-flex opacity-50" />
+              <button
+                type="button"
+                onClick={() => setIsRecordOpen(true)}
+                className="hover:text-fg underline uppercase cursor-pointer"
+              >
+                [ VIEW DOSSIER ]
+              </button>
+            </div>
           </div>
         </footer>
 
